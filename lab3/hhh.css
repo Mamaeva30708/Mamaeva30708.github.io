@@ -1,0 +1,13 @@
+@media screen and (min-width: 768px)  {
+h1 {
+width: 100%;
+background-color: #lightgrey;
+}
+}
+@media screen and (max-width: 1079) {
+p {
+width: 100%;
+background-color: #F7F9F2;
+}
+}
+
