@@ -1,3 +1,7 @@
+
+img {
+  border: 4px solid #1F6357;
+}
 .picture {
     float: right;
     padding-left: 10px;
@@ -45,7 +49,7 @@ width: 80%;
 }
 @media screen and (max-width: 1179px)  and (min-width: 1024px){
     .picture {
-        width: 400px;
+        width: 350px;
     }
 }
 @media screen and (min-width: 1200px){
