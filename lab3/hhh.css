@@ -1,13 +1,21 @@
-@media screen and (min-width: 768px)  {
-h1 {
-width: 100%;
-background-color: #lightgrey;
+@media screen and (min-width: 768px)  and (max-width: 1023px){
+  .picture {
+    width: 300px;
+  }
+  h1 {
+width: 80%;
+ }
+  p {
+    width: 70%;
+  }
 }
+@media screen and (max-width: 1179px)  and (min-width: 1024px){
+    .picture {
+        width: 400px;
+    }
 }
-@media screen and (max-width: 1079) {
-p {
-width: 100%;
-background-color: #F7F9F2;
+@media screen and (min-width: 1200px){
+    .picture {
+        width: 500px;
+    }
 }
-}
-
