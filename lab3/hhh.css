@@ -15,7 +15,7 @@ h1 {
 }
 
 #title {
-font-size: 7rem;
+font-size: 5rem;
 font-weight: normal;
 color: #1F6357;
 font-family: "Gabriela";
@@ -24,7 +24,7 @@ font-family: "Gabriela";
 
 p {
     font-weight: normal;
-    font-size: 5rem;
+    font-size: 3rem;
     color: #000080;
     font-family: "Times New Roman", Times, serif;
    }
