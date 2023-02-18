@@ -13,7 +13,7 @@ img {
   }
 h1 {
   font-weight: normal;
-  font-size: large;
+  font-size: 1.5rem;
   color: #000080;
   font-family: "Times New Roman", Times, serif;
 }
@@ -27,7 +27,7 @@ font-family: "Gabriela";
 
 
 p {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: normal;
     color: #000080;
     font-family: "Times New Roman", Times, serif;
