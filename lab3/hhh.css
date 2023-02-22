@@ -27,7 +27,7 @@ font-family: "Gabriela";
 
 
 p {
-    font-size: 1rem;
+    font-size: 1.3rem;
     font-weight: normal;
     color: #000080;
     font-family: "Times New Roman", Times, serif;
@@ -49,7 +49,7 @@ width: 80%;
 }
 @media screen and (max-width: 1179px)  and (min-width: 1024px){
     .picture {
-        width: 90%;
+        width: 350px;
         height: auto;
       /*  width: 350px; */
     }
