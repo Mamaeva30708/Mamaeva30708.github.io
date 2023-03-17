@@ -635,3 +635,119 @@ width: 70%;
   font-size: 14px;
   line-height: 15px;
 }
+.classic{
+  width:267px;
+  height: 20px;
+  left: 44px;
+  top: 1355px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 30px;
+}
+.cl1{
+  width: 216px;
+  height: 20px;
+  left: 44px;
+  top: 1378px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.cl2{
+  width: 120px;
+  height: 25px;
+  left: 44px;
+  top: 1403px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.soup{
+  width: 267px;
+  height: 20px;
+  left: 44px;
+  top: 1609px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 30px;
+}
+.sp1{
+  width: 267px;
+  height: 20px;
+  left: 44px;
+  top: 1609px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.sp2{
+  width: 135px;
+  height: 20px;
+  left: 44px;
+  top: 1640px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.stew{
+  width: 208px;
+  height: 30px;
+  left: 44px;
+  top: 1845px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 30px;
+}
+.st1{
+  width: 152px;
+  height: 30px;
+  left: 44px;
+  top: 1865px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.st2{
+  width: 120px;
+  height: 30px;
+  left: 44px;
+  top: 1880px;
+  font-size: 14px;
+  line-height: 30px;
+}
+.block1{
+  width: 272px;
+  height: 65px;
+  left: 44px;
+  top: 1937px;
+  font-size: 14px;
+  line-height: 20px
+}
+.block2{
+  width: 244px;
+  height: 55px;
+  left: 44px;
+  top: 2010px;
+  font-size: 14px;
+  line-height: 18px
+}
+#btn5{
+  width: 132px;
+  height: 33px;
+  left: 44px;
+  top: 2072px;
+}
+.insticon{
+  width: 35px;
+  height: 35px;
+  top: 195px;
+  left:792px;
+}
+.twiticon{
+  width: 35px;
+  height: 35px;
+  top: 195px;
+  left: 847px;
+}
+.youticon{
+  width: 35px;
+  height: 35px;
+  top: 195px;
+  left: 902px;
+}
+}
