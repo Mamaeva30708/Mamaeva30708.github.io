@@ -1,0 +1,13 @@
+img {
+    border: 4px solid #1F6357;
+  }
+  .picture1 {
+      width: 414px;
+      height: 546px;
+    }
+  h1 {
+    font-weight: normal;
+    font-size: 1.6rem;
+    color: #000080;
+    font-family: "Times New Roman", Times, serif;
+  }
