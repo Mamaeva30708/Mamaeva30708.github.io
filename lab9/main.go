@@ -1,13 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"html/template"
 	"log"
 	"net/http"
-	"recipe/sql"
+	"strconv"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/lib/pq"
 )
 
 type UserInfo struct {
@@ -20,9 +21,23 @@ type server struct {
 	db *sql.DB
 }
 
-func dbConnect() server {
-	db, err := sql.Open("sqlite3", "recipe.sql")
+const (
+	host     = "localhost"
+	port     = 5432
+	user     = "postgres"
+	password = "12345"
+	dbname   = "recipes"
+)
+
+func dbConnect() *server {
+	dbconn := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
+	db, err := sql.Open("postgres", dbconn)
 	fmt.Println("Opening database")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = db.Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -39,35 +54,41 @@ func (s *server) formHandle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userName := r.FormValue("name")
-	age := r.FormValue("age")
-	userID, err := createUser(userName, age, s.db)
+	ageStr := r.FormValue("age")
+	userID, err := createUser(userName, ageStr, s.db)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	age, err := strconv.Atoi(ageStr)
+	if err != nil {
+		log.Fatal("age", err)
+	}
+
 	person := UserInfo{
-		UserID:   userID,
+		UserId:   userID,
 		UserName: userName,
 		Age:      age,
 	}
 
 	fmt.Println(person)
-	outputHTML(w, "./static/qwe.html", person)
+	outputHTML(w, "./static/qweFinal.html", person)
 }
 
 func createUser(userName string, age string, db *sql.DB) (int, error) {
-	res, err := db.Exec("INSERT INTO users(userName, age) VALUES (?, ?)", userName, age)
+	user_id := 0
+	err := db.QueryRow(`INSERT INTO "users"("username", "age") VALUES ($1, $2) returning id`, userName, age).Scan(&user_id)
 	if err != nil {
 		return 0, err
 	}
 
-	user_id, err := res.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
+	// user_id, err := res.LastInsertId()
+	// if err != nil {
+	// 	return 0, err
+	// }
 
-	return int(userID), nil
+	return user_id, nil
 }
 
 func outputHTML(w http.ResponseWriter, filename string, person UserInfo) {
@@ -92,5 +113,6 @@ func main() {
 	http.HandleFunc("/form", s.formHandle)
 
 	fmt.Print("Server is up and running...")
+	defer s.db.Close()
 	http.ListenAndServe(":1806", nil)
 }
