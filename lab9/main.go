@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -91,6 +92,73 @@ func createUser(userName string, age string, db *sql.DB) (int, error) {
 	return user_id, nil
 }
 
+func getUser(userId int, db *sql.DB) (*UserInfo, error) {
+	row := db.QueryRow(`SELECT * FROM "users" WHERE id=$1`, userId)
+
+	user := &UserInfo{}
+	err := row.Scan(&user.UserId, &user.UserName, &user.Age)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
+}
+
+func updateUser(fullName string, role string, id int, s *server) int {
+	res, err := s.db.Exec("update users set fullName=?, role=? where id=?", fullName, role, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	user_id, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return int(user_id)
+}
+
+func (s *server) deleteUserHandle(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.URL.Query().Get("userId")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = deleteUser(userId, s)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+func deleteUser(userId int, s *server) error {
+	_, err := s.db.Exec(`DELETE FROM "users" WHERE "id"=$1`, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+func (s *server) getUserHandle(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.URL.Query().Get("userId")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	user, err := getUser(userId, s.db)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(user)
+}
+
 func outputHTML(w http.ResponseWriter, filename string, person UserInfo) {
 	t, err := template.ParseFiles(filename)
 	if err != nil {
@@ -104,6 +172,7 @@ func outputHTML(w http.ResponseWriter, filename string, person UserInfo) {
 	}
 
 }
+
 func main() {
 	s := dbConnect()
 	defer s.db.Close()
@@ -111,7 +180,8 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/form", s.formHandle)
-
+	http.HandleFunc("/user", s.getUserHandle)
+	http.HandleFunc("/delete/", s.deleteUserHandle)
 	fmt.Print("Server is up and running...")
 	defer s.db.Close()
 	http.ListenAndServe(":1806", nil)
