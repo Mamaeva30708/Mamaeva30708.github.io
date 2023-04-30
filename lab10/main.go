@@ -1,25 +1,3 @@
-img {
-    border: 4px solid #1F6357;
-  }
-  .picture1 {
-      width: 414px;
-      height: 546px;
-    }
-  h1 {
-    font-weight: normal;
-    font-size: 1.6rem;
-    color: #000080;
-    font-family: "Times New Roman", Times, serif;
-  }
-module modulename
-
-go 1.20
-
-require github.com/lib/pq v1.10.8
-
-github.com/lib/pq v1.10.8 h1:3fdt97i/cwSU83+E0hZTC/Xpc9mTZxc6UWSCRcSbxiE=
-github.com/lib/pq v1.10.8/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
-
 package main
 
 import (
@@ -68,6 +46,100 @@ func dbConnect() *server {
 	return &server{db: db}
 
 }
+func (s *server) selectUsers() []UserInfo {
+	rows, err := s.db.Query("select id, userName, age from users;")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var users []UserInfo
+	for rows.Next() {
+		var user UserInfo
+		err := rows.Scan(&user.UserId, &user.UserName, &user.Age)
+		if err != nil {
+			log.Fatal("selectUsers", err)
+		}
+		users = append(users, user)
+	}
+	if err = rows.Err(); err != nil {
+		log.Fatal("selectUsers2", err)
+	}
+
+	// fmt.Println(users)
+
+	return users
+}
+
+func (s *server) selectUser(id int) UserInfo {
+	rows := s.db.QueryRow("select id, userName, age from users where id=?;", id)
+
+	var user UserInfo
+	err := rows.Scan(&user.UserId, &user.UserName, &user.Age)
+	if err != nil {
+		log.Fatal("selectUsers", err)
+	}
+
+	return user
+}
+
+func (s *server) allUsersHandle(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./static/allUsers.html")
+	if err != nil {
+		log.Fatal("allUsersHandle", err)
+	}
+
+	allUsers := s.selectUsers()
+	errExecute := t.Execute(w, allUsers)
+	fmt.Println(allUsers[0].UserName)
+	if errExecute != nil {
+		log.Fatal("allUsersHandle2", err)
+	}
+}
+func (s *server) updateUserByID(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	id := r.FormValue("id")
+	idInt, err := strconv.Atoi(id)
+	userName := r.FormValue("name")
+	age := r.FormValue("age")
+	updateUser(userName, age, idInt, s)
+	http.Redirect(w, r, "/users", http.StatusSeeOther)
+}
+
+func (s *server) updateUserForm(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./static/update.html")
+	if err != nil {
+		log.Fatal("allUsersHandle", err)
+	}
+
+	err = r.ParseForm()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	id := r.FormValue("id")
+	idInt, err := strconv.Atoi(id)
+	user := s.selectUser(idInt)
+
+	t.Execute(w, user)
+}
+
+func (s *server) allUserChangeHandle(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("./static/update.html")
+	if err != nil {
+		log.Fatal("allUsersHandle", err)
+	}
+
+	allUsers := s.selectUsers()
+	errExecute := t.Execute(w, allUsers)
+	// fmt.Println(allUsers[0].FullName)
+	if errExecute != nil {
+		log.Fatal("allUsersHandle2", err)
+	}
+}
 
 func (s *server) formHandle(w http.ResponseWriter, r *http.Request) {
 	if err := r.ParseForm(); err != nil {
@@ -113,57 +185,86 @@ func createUser(userName string, age string, db *sql.DB) (int, error) {
 	return user_id, nil
 }
 
-func getUser(userId int, db *sql.DB) (*UserInfo, error) {
-    row := db.QueryRow(`SELECT * FROM "users" WHERE id=$1`, UserId)
+/*func getUsers(db *sql.DB) ([]UserInfo, error) {
+	rows, err := db.Query(`SELECT * FROM "users"`)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-    user := &UserInfo{}
-    err := row.Scan(&user.UserId, &user.UserName, &user.Age)
-    if err != nil {
-        return nil, err
-    }
+	var usersInfo []UserInfo
+	for rows.Next() {
+		var user UserInfo
+		err := rows.Scan(&user.UserId, &user.UserName, &user.Age)
+		if err != nil {
+			return nil, err
+		}
+		usersInfo = append(usersInfo, user)
+	}
 
-    return user, nil
+	return usersInfo, nil
 }
- 
-func updateUser(userId int, userName string, age string, db *sql.DB) error {
-    _, err := db.Exec(`UPDATE "users" SET "username"=$1, "age"=$2 WHERE "id"=$3`, userName, age, userId)
-    if err != nil {
-        return err
-    }
+*/
 
-    return nil
+func (s *server) updateUser(userName string, age int, id int) int {
+	res, err := s.db.Exec("update users set userName=?, age=? where id=?", userName, age, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	user_id, err := res.RowsAffected()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return int(user_id)
 }
 
-func deleteUser(userId int, db *sql.DB) error {
-    _, err := db.Exec(`DELETE FROM "users" WHERE "id"=$1`, userId)
-    if err != nil {
-        return err
-    }
+func (s *server) deleteUserHandle(w http.ResponseWriter, r *http.Request) {
+	userIdStr := r.URL.Query().Get("userId")
+	userId, err := strconv.Atoi(userIdStr)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-    return nil
-}
-func (s *server) getUserHandle(w http.ResponseWriter, r *http.Request) {
-    userIdStr := r.URL.Query().Get("userId")
-    userId, err := strconv.Atoi(userIdStr)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusBadRequest)
-        return
-    }
-
-    user, err := getUser(userId, s.db)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-
-    json.NewEncoder(w).Encode(user)
-}
-func (s *server) formHandle(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
+	err = deleteUser(userId, s)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
+	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+func deleteUser(userId int, s *server) error {
+	_, err := s.db.Exec(`DELETE FROM "users" WHERE "id"=$1`, userId)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+/*
+	func (s *server) getUserHandle(w http.ResponseWriter, r *http.Request){
+		users, err := getUsers(s.db)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		t, err := template.ParseFiles("./static/allUsers.html")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		if err := t.Execute(w, users); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+}
+*/
 func outputHTML(w http.ResponseWriter, filename string, person UserInfo) {
 	t, err := template.ParseFiles(filename)
 	if err != nil {
@@ -177,6 +278,7 @@ func outputHTML(w http.ResponseWriter, filename string, person UserInfo) {
 	}
 
 }
+
 func main() {
 	s := dbConnect()
 	defer s.db.Close()
@@ -184,10 +286,15 @@ func main() {
 	fs := http.FileServer(http.Dir("static"))
 	http.Handle("/", fs)
 	http.HandleFunc("/form", s.formHandle)
-    http.HandleFunc("/user", s.getUserHandle)
+	http.HandleFunc("/users", s.allUsersHandle)
+	http.HandleFunc("/change", s.allUserChangeHandle)
 	http.HandleFunc("/update", s.updateUserForm)
-	http.HandleFunc("/delete", s.deleteUser)
+	http.HandleFunc("/delete", s.deleteUserHandle)
+	// http.HandleFunc("/update", s.updateUser)
+	http.HandleFunc("/update", s.updateUserForm)
+	http.HandleFunc("/updateUserByID", s.updateUserByID)
 	fmt.Print("Server is up and running...")
 	defer s.db.Close()
 	http.ListenAndServe(":1806", nil)
 }
+
