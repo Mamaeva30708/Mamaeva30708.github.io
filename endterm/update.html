@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>All Users</title>
+    <style>
+      th, td {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>All users:</h1>
+    <table>
+      	<tr>
+          <th>id</th>
+          <th>UserName</th>
+          <th>Age</th>
+          <th>created at</th>
+          <th>Update</th>
+          <th>Delete</th>
+    	</tr>
+      	{{range .}}
+      			<tr>
+              		<td>{{.UserId}}</td>
+              		<td>{{.UserName}}</td>
+                  <td>{{.Age}}</td>
+                  <td>
+                    <form action="/update" method="post">
+                      <button name="id" value={{.UserId}}>Update</button>
+                    </form>
+                  </td>
+                  <td>
+                    <form action="/delete" method="post">
+                      <button name="id" value={{.UserId}}>Delete</button>
+                    </form>
+                  </td>
+      			</tr>
+      	{{end}}
+    </table>
+    <br>
+    <button><a href="index.html">Go to main page</a></button>
+    <h1>Update User</h1>
+    <form method="POST" action="/updateUserByID">
+      <input name="id" type="hidden" value={{.User_id}} />
+      <label>User Name</label><input name="name" type="text" value={{.UserName}} /> <br> <br>
+      <label>Role</label><input name="role" type="text" value={{.Age}} /> <br>
+      <input type="submit" value="submit" />
+    </form>
+  </body>
+</html>
