@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Delete post</title>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="../css/style.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Playfair+Display&display=swap"
+            rel="stylesheet"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link
+            href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200&family=Playfair+Display&display=swap"
+            rel="stylesheet"
+    />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <style>
+        .main {
+            color: white;
+            width: 400px;
+            padding: 40px 50px;
+            margin-top: 200px;
+            background-color: #c3b091;
+            border-radius: 10px;
+        }
+        label {
+            font-size: 25px;
+        }
+        input {
+            padding: 6px;
+            font-size: 20px;
+            background-color: white;
+            border-radius: 5px;
+            border: none;
+            margin-top: 10px;
+        }
+        button {
+            width: 150px;
+            height: 30px;
+            background-color: white;
+            border: 1px solid black;
+            border-radius: 3px;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid d-flex justify-content-center">
+        <div class="row main">
+            <div class="col-12 d-flex justify-content-center">
+                <h2>Confirm</h2>
+            </div>
+            <form action="/deletepost" method="post">
+            <div class="col-12">
+                <input type="hidden" name="id" value={{.id}}>
+            </div>
+            <div class="col-12">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="username">
+            </div>
+            <div class="col-12 d-flex justify-content-center mt-4">
+                <button type="submit">Auth</button>
+            </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
